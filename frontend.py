@@ -9,8 +9,24 @@ import streamlit as st
 import requests
 import base64
 import json
+import os
 
-API_URL = "http://127.0.0.1:8000"   # change this if your server runs on a different port
+
+def get_api_url() -> str:
+    # Priority: env var -> Streamlit secrets -> local dev default.
+    env_url = os.getenv("BACKEND_URL")
+    if env_url:
+        return env_url.rstrip("/")
+    try:
+        secret_url = st.secrets.get("BACKEND_URL")
+        if secret_url:
+            return str(secret_url).rstrip("/")
+    except Exception:
+        pass
+    return "http://127.0.0.1:8000"
+
+
+API_URL = get_api_url()
 
 st.set_page_config(page_title="Task Manager", page_icon="✅")
 st.title("✅ Task Manager")
@@ -47,7 +63,10 @@ def api_request(method: str, path: str, **kwargs):
     try:
         return requests.request(method, f"{API_URL}{path}", timeout=10, **kwargs)
     except requests.exceptions.ConnectionError:
-        st.error("Cannot connect to backend at http://localhost:8000. Start FastAPI first.")
+        st.error(
+            f"Cannot connect to backend at {API_URL}. "
+            "If this is Streamlit Cloud, set BACKEND_URL to your deployed FastAPI URL."
+        )
         return None
 
 
