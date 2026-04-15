@@ -10,7 +10,7 @@ import requests
 import base64
 import json
 
-API_URL = "http://localhost:8000"   # change this if your server runs on a different port
+API_URL = "http://127.0.0.1:8000"   # change this if your server runs on a different port
 
 st.set_page_config(page_title="Task Manager", page_icon="✅")
 st.title("✅ Task Manager")
